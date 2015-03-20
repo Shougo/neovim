@@ -1,6 +1,7 @@
 let s:hosts = {}
 let s:plugin_patterns = {
-      \ 'python': '*.py'
+      \ 'python': '*.py',
+      \ 'python3': '*.py',
       \ }
 let s:remote_plugins_manifest = fnamemodify($MYVIMRC, ':p:h')
       \.'/.'.fnamemodify($MYVIMRC, ':t').'-rplugin~'
@@ -250,4 +251,78 @@ function! s:RequirePythonHost(name)
 endfunction
 
 call remote#host#Register('python', function('s:RequirePythonHost'))
+" }}}
+" Python3 {{{
+function! s:RequirePython3Host(name)
+  " Python host arguments
+  let args = ['-c', 'import neovim; neovim.start_host()']
+
+  " Collect registered python plugins into args
+  let python_plugins = s:PluginsForHost(a:name)
+  for plugin in python_plugins
+    call add(args, plugin.path)
+  endfor
+
+  " Try loading a python host using `python3_host_prog` or `python3`
+  let python_host_prog = get(g:, 'python3_host_prog', 'python3')
+  try
+    let channel_id = rpcstart(python_host_prog, args)
+    if rpcrequest(channel_id, 'poll') == 'ok'
+      return channel_id
+    endif
+  catch
+  endtry
+
+  " Failed, try a little harder to find the correct interpreter or 
+  " report a friendly error to user
+  let get_version =
+        \ ' -c "import sys; sys.stdout.write(str(sys.version_info[0]) + '.
+        \ '\".\" + str(sys.version_info[1]))"'
+
+  let supported = ['3.3', '3.4', '3.5']
+
+  " To load the python3 host a python executable must be available
+  if exists('g:python3_host_prog')
+        \ && executable(g:python_host_prog)
+        \ && index(supported, system(g:python_host_prog.get_version)) >= 0
+    let python_host_prog = g:python_host_prog
+  elseif executable('python')
+        \ && index(supported, system('python'.get_version)) >= 0
+    " In some distros, python3 is the default python
+    let python_host_prog = 'python'
+  elseif executable('python3')
+        \ && index(supported, system('python3'.get_version)) >= 0
+    let python_host_prog = 'python3'
+  else
+    throw 'No python3 interpreter found.' .
+      \ " Try setting 'let g:python3_host_prog=/path/to/python3' in your '.nvimrc'" .
+      \ " or see ':help nvim-python3'."
+  endif
+
+  " Make sure we pick correct python version on path.
+  let python_host_prog = exepath(python_host_prog)
+  let python_version = systemlist(python_host_prog . ' --version')[0]
+
+  " Execute python, import neovim and print a string. If import_result doesn't
+  " matches the printed string, the user is missing the neovim module
+  let import_result = system(python_host_prog .
+        \ ' -c "import neovim, sys; sys.stdout.write(\"ok\")"')
+  if import_result != 'ok'
+    throw 'No neovim module found for ' . python_version . '.' .
+      \ " Try installing it with 'pip3 install neovim' or see ':help nvim-python3'."
+  endif
+
+  try
+    let channel_id = rpcstart(python_host_prog, args)
+    if rpcrequest(channel_id, 'poll') == 'ok'
+      return channel_id
+    endif
+  catch
+  endtry
+  throw 'Failed to load python3 host.' .
+    \ " Try upgrading the Neovim python3 module with 'pip3 install --upgrade neovim'" .
+    \ " or see ':help nvim-python3'."
+endfunction
+
+call remote#host#Register('python3', function('s:RequirePython3Host'))
 " }}}
