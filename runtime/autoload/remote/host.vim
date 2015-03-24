@@ -194,9 +194,8 @@ function! s:RequirePythonHost(name)
   let host_var = (ver == 2) ?
         \ 'python_host_prog' : 'python3_host_prog'
 
-  " Try loading a Python host using `python_host_prog` or `python`
-  let python_host_prog = get(g:, host_var, 'python' .
-        \ (ver == 2 ? '': '3'))
+  " Try loading a Python host using `python_host_prog` or `python2/3`
+  let python_host_prog = get(g:, host_var, 'python' .ver)
   try
     let channel_id = rpcstart(python_host_prog, args)
     if rpcrequest(channel_id, 'poll') == 'ok'
@@ -216,10 +215,10 @@ function! s:RequirePythonHost(name)
 
   " To load the Python/Python3 host a Python/Python3 executable must be
   " available
-  if exists('g:' . host_var)
-        \ && executable(g:{host_var})
-        \ && index(supported, system(g:{host_var}.get_version)) >= 0
-    let python_host_prog = g:{host_var}
+  if has_key(g:, host_var)
+        \ && executable(g:[host_var])
+        \ && index(supported, system(g:[host_var].get_version)) >= 0
+    let python_host_prog = g:[host_var]
   elseif executable('python')
         \ && index(supported, system('python'.get_version)) >= 0
     let python_host_prog = 'python'
