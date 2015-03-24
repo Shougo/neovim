@@ -71,14 +71,12 @@ class ScriptHost(object):
         sys.stderr = self.saved_stderr
 
     @neovim.rpc_export('python_execute', sync=True)
-    @neovim.rpc_export('python3_execute', sync=True)
     def python_execute(self, script, range_start, range_stop):
         """Handle the `python` ex command."""
         self._set_current_range(range_start, range_stop)
         exec(script, self.module.__dict__)
 
     @neovim.rpc_export('python_execute_file', sync=True)
-    @neovim.rpc_export('python3_execute_file', sync=True)
     def python_execute_file(self, file_path, range_start, range_stop):
         """Handle the `pyfile` ex command."""
         self._set_current_range(range_start, range_stop)
@@ -87,7 +85,6 @@ class ScriptHost(object):
             exec(script, self.module.__dict__)
 
     @neovim.rpc_export('python_do_range', sync=True)
-    @neovim.rpc_export('python3_do_range', sync=True)
     def python_do_range(self, start, stop, code):
         """Handle the `pydo` ex command."""
         self._set_current_range(start, stop)
@@ -150,7 +147,6 @@ class ScriptHost(object):
         del self.module.__dict__[fname]
 
     @neovim.rpc_export('python_eval', sync=True)
-    @neovim.rpc_export('python3_eval', sync=True)
     def python_eval(self, expr):
         """Handle the `pyeval` vim function."""
         return eval(expr, self.module.__dict__)

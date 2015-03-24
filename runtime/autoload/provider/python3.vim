@@ -27,5 +27,5 @@ endtry
 let s:rpcrequest = function('rpcrequest')
 
 function! provider#python3#Call(method, args)
-  return call(s:rpcrequest, insert(insert(a:args, 'python3_'.a:method), s:host))
+  return call(s:rpcrequest, insert(insert(a:args, 'python_'.a:method), s:host))
 endfunction
