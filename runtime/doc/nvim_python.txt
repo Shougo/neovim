@@ -17,11 +17,11 @@ offers some support for the legacy |python-vim| and |python3-vim| interface.
 For now only the old Vim 7.3 API is supported.
 
 ==============================================================================
-2. Quickstart
+2. Quickstart						 *nvim-python-quickstart*
 
 Most Python plugins created for Vim 7.3 should work after these steps.
 
-							*nvim-python-quickstart*
+							*nvim-python2-quickstart*
 
 If you just want to start using Vim Python plugins with Nvim quickly, here's a
 simple tutorial:
