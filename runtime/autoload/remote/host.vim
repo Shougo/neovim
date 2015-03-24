@@ -178,8 +178,10 @@ endfunction
 
 " Registration of standard hosts
 
-" Python {{{
+" Python/Python3 {{{
 function! s:RequirePythonHost(name)
+  let ver = (a:name ==# 'python') ? 2 : 3
+
   " Python host arguments
   let args = ['-c', 'import neovim; neovim.start_host()']
 
@@ -189,8 +191,11 @@ function! s:RequirePythonHost(name)
     call add(args, plugin.path)
   endfor
 
+  let host_var = (ver == 2) ?
+        \ 'python_host_prog' : 'python3_host_prog'
+
   " Try loading a Python host using `python_host_prog` or `python`
-  let python_host_prog = get(g:, 'python_host_prog', 'python')
+  let python_host_prog = get(g:, host_var, 'python')
   try
     let channel_id = rpcstart(python_host_prog, args)
     if rpcrequest(channel_id, 'poll') == 'ok'
@@ -205,37 +210,44 @@ function! s:RequirePythonHost(name)
         \ ' -c "import sys; sys.stdout.write(str(sys.version_info[0]) + '.
         \ '\".\" + str(sys.version_info[1]))"'
 
-  let supported = ['2.6', '2.7']
+  let supported = (ver == 2) ?
+        \ ['2.6', '2.7'] : ['3.3', '3.4', '3.5']
 
-  " To load the Python host a Python executable must be available
-  if exists('g:python_host_prog')
-        \ && executable(g:python_host_prog)
-        \ && index(supported, system(g:python_host_prog.get_version)) >= 0
-    let python_host_prog = g:python_host_prog
+  " To load the Python/Python3 host a Python/Python3 executable must be
+  " available
+  if exists('g:' . host_var)
+        \ && executable(g:{host_var})
+        \ && index(supported, system(g:{host_var}.get_version)) >= 0
+    let python_host_prog = g:{host_var}
   elseif executable('python')
         \ && index(supported, system('python'.get_version)) >= 0
     let python_host_prog = 'python'
-  elseif executable('python2')
+  elseif ver == 3 && executable('python3')
+        \ && index(supported, system('python3'.get_version)) >= 0
+    " In some distros, python2 is the default python command
+    let python_host_prog = 'python3'
+  elseif ver == 2 && executable('python2')
         \ && index(supported, system('python2'.get_version)) >= 0
     " In some distros, python3 is the default python command
     let python_host_prog = 'python2'
   else
     throw 'No Python interpreter found in your $PATH.' .
-      \ " Try setting 'let g:python_host_prog=/path/to/python' in your '.nvimrc'" .
+      \ " Try setting 'let g:" . host_var .
+      \ "=/path/to/python' in your '.nvimrc'" .
       \ " or see ':help nvim-python'."
   endif
 
   " Make sure we pick correct Python version on path.
   let python_host_prog = exepath(python_host_prog)
-  let python_version = systemlist(python_host_prog . ' --version')[0]
 
   " Execute Python, import neovim and print a string. If import_result doesn't
   " matches the printed string, the user is missing the neovim module
   let import_result = system(python_host_prog .
         \ ' -c "import neovim, sys; sys.stdout.write(\"ok\")"')
   if import_result != 'ok'
-    throw 'No neovim module found for ' . python_version . '.' .
-      \ " See ':help nvim-python'."
+    throw 'No neovim module found for ' .
+          \ systemlist(python_host_prog . ' --version')[0] . '.' .
+          \ " See ':help nvim-python'."
   endif
 
   try
@@ -246,82 +258,11 @@ function! s:RequirePythonHost(name)
   catch
   endtry
   throw 'Failed to load Python host.' .
-    \ " Try upgrading the Neovim python module with 'pip install --upgrade neovim'" .
+    \ " Try upgrading the Neovim python module with 'pip" . version .
+    \ " install --upgrade neovim'" .
     \ " or see ':help nvim-python'."
 endfunction
 
 call remote#host#Register('python', function('s:RequirePythonHost'))
-" }}}
-" Python3 {{{
-function! s:RequirePython3Host(name)
-  " Python host arguments
-  let args = ['-c', 'import neovim; neovim.start_host()']
-
-  " Collect registered Python plugins into args
-  let python_plugins = s:PluginsForHost(a:name)
-  for plugin in python_plugins
-    call add(args, plugin.path)
-  endfor
-
-  " Try loading a python host using `python3_host_prog` or `python3`
-  let python_host_prog = get(g:, 'python3_host_prog', 'python3')
-  try
-    let channel_id = rpcstart(python_host_prog, args)
-    if rpcrequest(channel_id, 'poll') == 'ok'
-      return channel_id
-    endif
-  catch
-  endtry
-
-  " Failed, try a little harder to find the correct interpreter or 
-  " report a friendly error to user
-  let get_version =
-        \ ' -c "import sys; sys.stdout.write(str(sys.version_info[0]) + '.
-        \ '\".\" + str(sys.version_info[1]))"'
-
-  let supported = ['3.3', '3.4', '3.5']
-
-  " To load the Python3 host a Python executable must be available
-  if exists('g:python3_host_prog')
-        \ && executable(g:python_host_prog)
-        \ && index(supported, system(g:python_host_prog.get_version)) >= 0
-    let python_host_prog = g:python_host_prog
-  elseif executable('python')
-        \ && index(supported, system('python'.get_version)) >= 0
-    " In some distros, python3 is the default python command
-    let python_host_prog = 'python'
-  elseif executable('python3')
-        \ && index(supported, system('python3'.get_version)) >= 0
-    let python_host_prog = 'python3'
-  else
-    throw 'No Python3 interpreter found in your $PATH.' .
-      \ " See ':help nvim-python3'."
-  endif
-
-  " Make sure we pick correct Python version on path.
-  let python_host_prog = exepath(python_host_prog)
-  let python_version = systemlist(python_host_prog . ' --version')[0]
-
-  " Execute Python, import neovim and print a string. If import_result doesn't
-  " matches the printed string, the user is missing the neovim module
-  let import_result = system(python_host_prog .
-        \ ' -c "import neovim, sys; sys.stdout.write(\"ok\")"')
-  if import_result != 'ok'
-    throw 'No neovim module found for ' . python_version . '.' .
-      \ " Try installing it with 'pip3 install neovim' or see ':help nvim-python3'."
-  endif
-
-  try
-    let channel_id = rpcstart(python_host_prog, args)
-    if rpcrequest(channel_id, 'poll') == 'ok'
-      return channel_id
-    endif
-  catch
-  endtry
-  throw 'Failed to load python3 host.' .
-    \ " Try upgrading the Neovim python3 module with 'pip3 install --upgrade neovim'" .
-    \ " or see ':help nvim-python3'."
-endfunction
-
-call remote#host#Register('python3', function('s:RequirePython3Host'))
+call remote#host#Register('python3', function('s:RequirePythonHost'))
 " }}}
