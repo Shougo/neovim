@@ -35,7 +35,7 @@ class ScriptHost(object):
         if IS_PYTHON3:
             self.legacy_vim = self.legacy_vim.with_hook(
                 neovim.DecodeHook(
-                    encoding=nvim.options['encoding'].decode('ascii')))
+                    encoding=nvim.options['encoding']))
         sys.modules['vim'] = self.legacy_vim
 
     def setup(self, nvim):
@@ -169,6 +169,9 @@ class RedirectStream(object):
 
     def writelines(self, seq):
         self.redirect_handler('\n'.join(seq))
+
+    def flush(self):
+        pass
 
 
 class LegacyEvalHook(neovim.SessionHook):
