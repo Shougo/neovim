@@ -52,7 +52,7 @@ function! remote#host#IsRunning(name)
 endfunction
 
 
-" Example of registering a python plugin with two commands(one async), one
+" Example of registering a Python plugin with two commands(one async), one
 " autocmd(async) and one function(sync):
 "
 " let s:plugin_path = expand('<sfile>:p:h').'/nvim_plugin.py'
@@ -183,13 +183,13 @@ function! s:RequirePythonHost(name)
   " Python host arguments
   let args = ['-c', 'import neovim; neovim.start_host()']
 
-  " Collect registered python plugins into args
+  " Collect registered Python plugins into args
   let python_plugins = s:PluginsForHost(a:name)
   for plugin in python_plugins
     call add(args, plugin.path)
   endfor
 
-  " Try loading a python host using `python_host_prog` or `python`
+  " Try loading a Python host using `python_host_prog` or `python`
   let python_host_prog = get(g:, 'python_host_prog', 'python')
   try
     let channel_id = rpcstart(python_host_prog, args)
@@ -207,7 +207,7 @@ function! s:RequirePythonHost(name)
 
   let supported = ['2.6', '2.7']
 
-  " To load the python host a python executable must be available
+  " To load the Python host a Python executable must be available
   if exists('g:python_host_prog')
         \ && executable(g:python_host_prog)
         \ && index(supported, system(g:python_host_prog.get_version)) >= 0
@@ -217,25 +217,25 @@ function! s:RequirePythonHost(name)
     let python_host_prog = 'python'
   elseif executable('python2')
         \ && index(supported, system('python2'.get_version)) >= 0
-    " In some distros, python3 is the default python
+    " In some distros, python3 is the default python command
     let python_host_prog = 'python2'
   else
-    throw 'No python interpreter found.' .
+    throw 'No Python interpreter found in your $PATH.' .
       \ " Try setting 'let g:python_host_prog=/path/to/python' in your '.nvimrc'" .
       \ " or see ':help nvim-python'."
   endif
 
-  " Make sure we pick correct python version on path.
+  " Make sure we pick correct Python version on path.
   let python_host_prog = exepath(python_host_prog)
   let python_version = systemlist(python_host_prog . ' --version')[0]
 
-  " Execute python, import neovim and print a string. If import_result doesn't
+  " Execute Python, import neovim and print a string. If import_result doesn't
   " matches the printed string, the user is missing the neovim module
   let import_result = system(python_host_prog .
         \ ' -c "import neovim, sys; sys.stdout.write(\"ok\")"')
   if import_result != 'ok'
     throw 'No neovim module found for ' . python_version . '.' .
-      \ " Try installing it with 'pip install neovim' or see ':help nvim-python'."
+      \ " See ':help nvim-python'."
   endif
 
   try
@@ -245,7 +245,7 @@ function! s:RequirePythonHost(name)
     endif
   catch
   endtry
-  throw 'Failed to load python host.' .
+  throw 'Failed to load Python host.' .
     \ " Try upgrading the Neovim python module with 'pip install --upgrade neovim'" .
     \ " or see ':help nvim-python'."
 endfunction
@@ -257,7 +257,7 @@ function! s:RequirePython3Host(name)
   " Python host arguments
   let args = ['-c', 'import neovim; neovim.start_host()']
 
-  " Collect registered python plugins into args
+  " Collect registered Python plugins into args
   let python_plugins = s:PluginsForHost(a:name)
   for plugin in python_plugins
     call add(args, plugin.path)
@@ -281,29 +281,28 @@ function! s:RequirePython3Host(name)
 
   let supported = ['3.3', '3.4', '3.5']
 
-  " To load the python3 host a python executable must be available
+  " To load the Python3 host a Python executable must be available
   if exists('g:python3_host_prog')
         \ && executable(g:python_host_prog)
         \ && index(supported, system(g:python_host_prog.get_version)) >= 0
     let python_host_prog = g:python_host_prog
   elseif executable('python')
         \ && index(supported, system('python'.get_version)) >= 0
-    " In some distros, python3 is the default python
+    " In some distros, python3 is the default python command
     let python_host_prog = 'python'
   elseif executable('python3')
         \ && index(supported, system('python3'.get_version)) >= 0
     let python_host_prog = 'python3'
   else
-    throw 'No python3 interpreter found.' .
-      \ " Try setting 'let g:python3_host_prog=/path/to/python3' in your '.nvimrc'" .
-      \ " or see ':help nvim-python3'."
+    throw 'No Python3 interpreter found in your $PATH.' .
+      \ " See ':help nvim-python3'."
   endif
 
-  " Make sure we pick correct python version on path.
+  " Make sure we pick correct Python version on path.
   let python_host_prog = exepath(python_host_prog)
   let python_version = systemlist(python_host_prog . ' --version')[0]
 
-  " Execute python, import neovim and print a string. If import_result doesn't
+  " Execute Python, import neovim and print a string. If import_result doesn't
   " matches the printed string, the user is missing the neovim module
   let import_result = system(python_host_prog .
         \ ' -c "import neovim, sys; sys.stdout.write(\"ok\")"')
