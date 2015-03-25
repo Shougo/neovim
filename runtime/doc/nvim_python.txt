@@ -13,7 +13,7 @@ Python plugins and scripting in Nvim				  *nvim-python*
 1. Introduction						    *nvim-python-intro*
 
 Through an external Python/Python3 interpreter connected via |msgpack-rpc|, Nvim
-offers some support for the legacy |python-vim| and |python3-vim| interface.
+offers some support for the legacy |python-vim| and |python3| interface.
 For now only the old Vim 7.3 API is supported.
 
 ==============================================================================
