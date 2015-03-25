@@ -181,11 +181,7 @@ endfunction
 
 " Python/Python3 {{{
 function! s:RequirePythonHost(name)
-  if has_key(s:hosts[a:name], 'orig_name')
-    let ver_name = s:hosts[a:name].orig_name
-  else
-    let ver_name = a:name
-  endif
+  let ver_name = get(s:hosts[a:name], 'orig_name', a:name)
   let ver = (ver_name ==# 'python') ? 2 : 3
 
   " Python host arguments
