@@ -27,7 +27,6 @@ function! remote#host#RegisterClone(name, orig_name)
   endif
   let Factory = s:hosts[a:orig_name].factory
   let s:hosts[a:name] = {'factory': Factory, 'channel': 0, 'initialized': 0}
-  let s:hosts[a:name].orig_name = a:orig_name
 endfunction
 
 
@@ -181,12 +180,7 @@ endfunction
 
 " Python/Python3 {{{
 function! s:RequirePythonHost(name)
-  if has_key(s:hosts[a:name], 'orig_name')
-    let ver_name = s:hosts[a:name].orig_name
-  else
-    let ver_name = a:name
-  endif
-  let ver = (ver_name ==# 'python') ? 2 : 3
+  let ver = (a:name ==# 'python') ? 2 : 3
 
   " Python host arguments
   let args = ['-c', 'import neovim; neovim.start_host()']
