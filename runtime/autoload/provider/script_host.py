@@ -74,7 +74,7 @@ class ScriptHost(object):
     def python_execute(self, script, range_start, range_stop):
         """Handle the `python` ex command."""
         self._set_current_range(range_start, range_stop)
-        exec(str(script), self.module.__dict__)
+        exec(script, self.module.__dict__)
 
     @neovim.rpc_export('python_execute_file', sync=True)
     def python_execute_file(self, file_path, range_start, range_stop):
@@ -178,12 +178,8 @@ class LegacyEvalHook(neovim.SessionHook):
         super(LegacyEvalHook, self).__init__(from_nvim=self._string_eval)
 
     def _string_eval(self, obj, session, method, kind):
-        if method == 'vim_eval':
-            if IS_PYTHON3:
-                if isinstance(obj, (int, float)):
-                    return str(obj)
-            elif isinstance(obj, (int, long, float)):
-                return str(obj)
+        if method == 'vim_eval' and isinstance(obj, (int, long, float)):
+            return str(obj)
         return obj
 
 
