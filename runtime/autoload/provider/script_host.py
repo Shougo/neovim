@@ -74,7 +74,7 @@ class ScriptHost(object):
     def python_execute(self, script, range_start, range_stop):
         """Handle the `python` ex command."""
         self._set_current_range(range_start, range_stop)
-        exec(script, self.module.__dict__)
+        exec(str(script), self.module.__dict__)
 
     @neovim.rpc_export('python_execute_file', sync=True)
     def python_execute_file(self, file_path, range_start, range_stop):
