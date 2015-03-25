@@ -26,8 +26,12 @@ function! remote#host#RegisterClone(name, orig_name)
     throw 'No host named "'.a:orig_name.'" is registered'
   endif
   let Factory = s:hosts[a:orig_name].factory
-  let s:hosts[a:name] = {'factory': Factory, 'channel': 0, 'initialized': 0}
-  let s:hosts[a:name].orig_name = a:orig_name
+  let s:hosts[a:name] = {
+        \ 'factory': Factory,
+        \ 'channel': 0,
+        \ 'initialized': 0,
+        \ 'orig_name': a:orig_name
+        \ }
 endfunction
 
 
