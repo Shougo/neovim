@@ -20,27 +20,27 @@ describe('python3 commands and functions', function()
     command('python3 import vim')
   end)
 
-  describe('feature test', function()
+  it('feature test', function()
     it('ok', function()
       eq(1, eval('has("python3")'))
     end)
   end)
 
-  describe('python3_execute', function()
+  it('python3_execute', function()
     it('ok', function()
       command('python3 vim.vars["set_by_python3"] = [100, 0]')
       eq({100, 0}, eval('g:set_by_python3'))
     end)
   end)
 
-  describe('python3_execute with nested commands', function()
+  it('python3_execute with nested commands', function()
     it('ok', function()
       command([[python3 vim.command('python3 vim.command("python3 vim.command(\'let set_by_nested_python3 = 555\')")')]])
       eq(555, eval('g:set_by_nested_python3'))
     end)
   end)
 
-  describe('python3_execute with range', function()
+  it('python3_execute with range', function()
     it('ok', function()
       insert([[
         line1
@@ -52,7 +52,7 @@ describe('python3 commands and functions', function()
     end)
   end)
 
-  describe('pyfile3', function()
+  it('pyfile3', function()
     it('ok', function()
       local fname = 'pyfile3.py'
       local F = io.open(fname, 'w')
@@ -64,7 +64,7 @@ describe('python3 commands and functions', function()
     end)
   end)
 
-  describe('pydo3', function()
+  it('pydo3', function()
     it('ok', function()
       -- :pydo3 42 returns None for all lines,
       -- the buffer should not be changed
@@ -85,7 +85,7 @@ describe('python3 commands and functions', function()
     end)
   end)
 
-  describe('pyeval3', function()
+  it('pyeval3', function()
     it('ok', function()
       eq({1, 2, {['key'] = 'val'}}, eval([[pyeval3('[1, 2, {"key": "val"}]')]]))
     end)
