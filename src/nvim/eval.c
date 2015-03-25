@@ -19929,11 +19929,14 @@ bool eval_has_provider(char *name)
     }                                                                     \
   }
 
-  static int has_clipboard = -1, has_python = -1;
+  static int has_clipboard = -1, has_python = -1, has_python3 = -1;
 
   if (!strcmp(name, "clipboard")) {
     check_provider(clipboard);
     return has_clipboard;
+  } else if (!strcmp(name, "python3")) {
+    check_provider(python3);
+    return has_python3;
   } else if (!strcmp(name, "python")) {
     check_provider(python);
     return has_python;
