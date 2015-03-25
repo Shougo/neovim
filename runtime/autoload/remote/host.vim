@@ -57,8 +57,8 @@ function! remote#host#IsRunning(name)
 endfunction
 
 
-" Example of registering a Python plugin with two commands(one async), one
-" autocmd(async) and one function(sync):
+" Example of registering a Python plugin with two commands (one async), one
+" autocmd (async) and one function (sync):
 "
 " let s:plugin_path = expand('<sfile>:p:h').'/nvim_plugin.py'
 " call remote#host#RegisterPlugin('python', s:plugin_path, [
@@ -230,11 +230,11 @@ function! s:RequirePythonHost(name)
     let python_host_prog = 'python'
   elseif ver == 3 && executable('python3')
         \ && index(supported, system('python3'.get_version)) >= 0
-    " In some distros, python2 is the default python command
+    " In some platforms, `python2` is symlinked to `python`.
     let python_host_prog = 'python3'
   elseif ver == 2 && executable('python2')
         \ && index(supported, system('python2'.get_version)) >= 0
-    " In some distros, python3 is the default python command
+    " In some platforms, `python3` is symlinked to `python`.
     let python_host_prog = 'python2'
   else
     throw printf('No Python%d interpreter found in your $PATH.' .
@@ -242,7 +242,7 @@ function! s:RequirePythonHost(name)
       \ " or see ':help nvim-python'.", ver, host_var)
   endif
 
-  " Make sure we pick correct Python version on path.
+  " Make sure we pick correct Python interpreter from the user's $PATH?
   let python_host_prog = exepath(python_host_prog)
 
   " Execute Python, import neovim and print a string. If import_result doesn't
