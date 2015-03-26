@@ -1,3 +1,5 @@
+set -o errexit
+
 valgrind_check() {
 	check_logs "$1" "valgrind-*"
 }
@@ -48,13 +50,13 @@ check_core_dumps() {
 }
 
 setup_deps() {
-	sudo pip --upgrade pip
+	sudo pip install --upgrade pip
 	sudo pip install neovim
 
 	# For pip3
 	# https://github.com/travis-ci/travis-ci/issues/1528 
-	curl http://python-distribute.org/distribute_setup.py | sudo python3
-	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py | sudo python3
+	curl -Ss http://python-distribute.org/distribute_setup.py | sudo python3
+	curl -Ss https://raw.github.com/pypa/pip/master/contrib/get-pip.py | sudo python3
 	sudo pip3.3 install neovim
 
 	if [ "$BUILD_NVIM_DEPS" != "true" ]; then
