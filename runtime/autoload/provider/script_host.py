@@ -238,11 +238,11 @@ def discover_runtime_directories(nvim):
     for path in nvim.list_runtime_paths():
         if not os.path.exists(path):
             continue
-        path1 = os.path.join(path, b'pythonx')
+        path1 = os.path.join(path, 'pythonx')
         if IS_PYTHON3:
-            path2 = os.path.join(path, b'python3')
+            path2 = os.path.join(path, 'python3')
         else:
-            path2 = os.path.join(path, b'python2')
+            path2 = os.path.join(path, 'python2')
         if os.path.exists(path1):
             rv.append(path1)
         if os.path.exists(path2):
