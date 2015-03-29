@@ -802,7 +802,7 @@ void ex_python3(exarg_T *eap)
   script_host_execute("python3", eap);
 }
 
-void ex_pyfile3(exarg_T *eap)
+void ex_py3file(exarg_T *eap)
 {
   script_host_execute_file("python3", eap);
 }

@@ -20,27 +20,27 @@ describe('python3 commands and functions', function()
     command('python3 import vim')
   end)
 
-  it('feature test', function()
+  describe('feature test', function()
     it('ok', function()
       eq(1, eval('has("python3")'))
     end)
   end)
 
-  it('python3_execute', function()
+  describe('python3_execute', function()
     it('ok', function()
       command('python3 vim.vars["set_by_python3"] = [100, 0]')
       eq({100, 0}, eval('g:set_by_python3'))
     end)
   end)
 
-  it('python3_execute with nested commands', function()
+  describe('python3_execute with nested commands', function()
     it('ok', function()
       command([[python3 vim.command('python3 vim.command("python3 vim.command(\'let set_by_nested_python3 = 555\')")')]])
       eq(555, eval('g:set_by_nested_python3'))
     end)
   end)
 
-  it('python3_execute with range', function()
+  describe('python3_execute with range', function()
     it('ok', function()
       insert([[
         line1
@@ -52,23 +52,23 @@ describe('python3 commands and functions', function()
     end)
   end)
 
-  it('pyfile3', function()
+  describe('py3file', function()
     it('ok', function()
-      local fname = 'pyfile3.py'
+      local fname = 'py3file.py'
       local F = io.open(fname, 'w')
-      F:write('vim.command("let set_by_pyfile3 = 123")')
+      F:write('vim.command("let set_by_py3file = 123")')
       F:close()
-      command('pyfile3 pyfile3.py')
-      eq(123, eval('g:set_by_pyfile3'))
+      command('py3file py3file.py')
+      eq(123, eval('g:set_by_py3file'))
       os.remove(fname)
     end)
   end)
 
-  it('pydo3', function()
+  describe('py3do', function()
     it('ok', function()
       -- :pydo3 42 returns None for all lines,
       -- the buffer should not be changed
-      command('normal :pydo3 42')
+      command('normal :py3do 42')
       eq(0, eval('&mod'))
       -- insert some text
       insert('abc\ndef\nghi')
@@ -77,7 +77,7 @@ describe('python3 commands and functions', function()
         def
         ghi]])
       -- go to top and select and replace the first two lines
-      feed('ggvj:pydo3 return str(linenr)<CR>')
+      feed('ggvj:py3do return str(linenr)<CR>')
       expect([[
         1
         2
@@ -85,9 +85,9 @@ describe('python3 commands and functions', function()
     end)
   end)
 
-  it('pyeval3', function()
+  describe('py3eval', function()
     it('ok', function()
-      eq({1, 2, {['key'] = 'val'}}, eval([[pyeval3('[1, 2, {"key": "val"}]')]]))
+      eq({1, 2, {['key'] = 'val'}}, eval([[py3eval('[1, 2, {"key": "val"}]')]]))
     end)
   end)
 end)

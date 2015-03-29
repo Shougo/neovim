@@ -1683,7 +1683,7 @@ return {
   {
     command='py3file',
     flags=bit.bor(RANGE, FILE1, NEEDARG, CMDWIN),
-    func='ex_pyfile3',
+    func='ex_py3file',
   },
   {
     command='quit',

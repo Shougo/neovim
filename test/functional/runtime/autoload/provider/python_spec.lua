@@ -20,27 +20,27 @@ describe('python commands and functions', function()
     command('python import vim')
   end)
 
-  it('feature test', function()
+  describe('feature test', function()
     it('ok', function()
       eq(1, eval('has("python")'))
     end)
   end)
 
-  it('python_execute', function()
+  describe('python_execute', function()
     it('ok', function()
       command('python vim.vars["set_by_python"] = [100, 0]')
       eq({100, 0}, eval('g:set_by_python'))
     end)
   end)
 
-  it('python_execute with nested commands', function()
+  describe('python_execute with nested commands', function()
     it('ok', function()
       command([[python vim.command('python vim.command("python vim.command(\'let set_by_nested_python = 555\')")')]])
       eq(555, eval('g:set_by_nested_python'))
     end)
   end)
 
-  it('python_execute with range', function()
+  describe('python_execute with range', function()
     it('ok', function()
       insert([[
         line1
@@ -52,7 +52,7 @@ describe('python commands and functions', function()
     end)
   end)
 
-  it('pyfile', function()
+  describe('pyfile', function()
     it('ok', function()
       local fname = 'pyfile.py'
       local F = io.open(fname, 'w')
@@ -64,7 +64,7 @@ describe('python commands and functions', function()
     end)
   end)
 
-  it('pydo', function()
+  describe('pydo', function()
     it('ok', function()
       -- :pydo 42 returns None for all lines,
       -- the buffer should not be changed
@@ -85,7 +85,7 @@ describe('python commands and functions', function()
     end)
   end)
 
-  it('pyeval', function()
+  describe('pyeval', function()
     it('ok', function()
       eq({1, 2, {['key'] = 'val'}}, eval([[pyeval('[1, 2, {"key": "val"}]')]]))
     end)
