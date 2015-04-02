@@ -38,7 +38,7 @@ To use Vim Python 2/3 plugins with Nvim, do the following:
 <
   or for the current user:
 >
-    $ pip install --user neovim
+    $ pip3 install --user neovim
 <
 ==============================================================================
 							   *g:python_host_prog*
