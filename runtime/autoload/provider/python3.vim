@@ -4,11 +4,11 @@
 " Associating the plugin with the Python3 host is the first step because
 " plugins will be passed as command-line arguments
 
-if exists('s:loaded_python3_provider')
+if exists('g:loaded_python3_provider')
   finish
 endif
 
-let s:loaded_python3_provider = 1
+let g:loaded_python3_provider = 1
 let s:plugin_path = expand('<sfile>:p:h').'/script_host.py'
 
 " The Python3 provider plugin will run in a separate instance of the Python3
