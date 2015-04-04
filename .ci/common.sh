@@ -1,4 +1,4 @@
-set -o errexit
+set -eu
 
 valgrind_check() {
 	check_logs "$1" "valgrind-*"
