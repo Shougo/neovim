@@ -204,7 +204,7 @@ function! s:RequirePythonHost(name)
   endfor
 
   let host_var = (ver == 2) ?
-        \ 'python_host_prog' : 'python3_host_prog'
+        \ 'g:python_host_prog' : 'g:python3_host_prog'
 
   " Try loading a Python host using `python_host_prog` or `python2/3`
   let python_host_prog = get(g:, host_var, 'python' .ver)
