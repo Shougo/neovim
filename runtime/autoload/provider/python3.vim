@@ -7,9 +7,20 @@
 if exists('g:loaded_python3_provider')
   finish
 endif
-
 let g:loaded_python3_provider = 1
+
+let s:prog = provider#pythonx#Detect(3)
+if s:prog == ''
+  " Detection failed
+  finish
+endif
+
+function! provider#python3#Prog()
+  return s:prog
+endfunction
+
 let s:plugin_path = expand('<sfile>:p:h').'/script_host.py'
+let s:rpcrequest = function('rpcrequest')
 
 " The Python3 provider plugin will run in a separate instance of the Python3
 " host.
@@ -23,8 +34,6 @@ catch
   echomsg v:exception
   finish
 endtry
-
-let s:rpcrequest = function('rpcrequest')
 
 function! provider#python3#Call(method, args)
   return call(s:rpcrequest, insert(insert(a:args, 'python_'.a:method), s:host))

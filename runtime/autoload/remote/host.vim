@@ -203,70 +203,14 @@ function! s:RequirePythonHost(name)
     call add(args, plugin.path)
   endfor
 
-  let host_var = (ver == 2) ?
-        \ 'g:python_host_prog' : 'g:python3_host_prog'
-
-  " Try loading a Python host using `python_host_prog` or `python2/3`
-  let python_host_prog = get(g:, host_var, 'python' .ver)
   try
-    let channel_id = rpcstart(python_host_prog, args)
+    let channel_id = rpcstart((ver == '2' ?
+          \ provider#python#Prog() : provider#python3#Prog()), args)
     if rpcrequest(channel_id, 'poll') == 'ok'
       return channel_id
     endif
   catch
-  endtry
-
-  " Failed, try a little harder to find the correct interpreter or 
-  " report a friendly error to user
-  let get_version =
-        \ ' -c "import sys; sys.stdout.write(str(sys.version_info[0]) + '.
-        \ '\".\" + str(sys.version_info[1]))"'
-
-  let supported = (ver == 2) ?
-        \ ['2.6', '2.7'] : ['3.3', '3.4', '3.5']
-
-  " To load the Python/Python3 host a Python/Python3 executable must be
-  " available
-  if has_key(g:, host_var)
-        \ && executable(g:[host_var])
-        \ && index(supported, system(g:[host_var].get_version)) >= 0
-    let python_host_prog = g:[host_var]
-  elseif executable('python')
-        \ && index(supported, system('python'.get_version)) >= 0
-    let python_host_prog = 'python'
-  elseif ver == 3 && executable('python3')
-        \ && index(supported, system('python3'.get_version)) >= 0
-    " In some platforms, `python2` is symlinked to `python`.
-    let python_host_prog = 'python3'
-  elseif ver == 2 && executable('python2')
-        \ && index(supported, system('python2'.get_version)) >= 0
-    " In some platforms, `python3` is symlinked to `python`.
-    let python_host_prog = 'python2'
-  else
-    throw printf('No Python%d interpreter found in your $PATH.' .
-      \ " Try setting 'let g:%s=/path/to/python' in your '.nvimrc'" .
-      \ " or see ':help nvim-python'.", ver, host_var)
-  endif
-
-  " Make sure we pick correct Python interpreter from the user's $PATH?
-  let python_host_prog = exepath(python_host_prog)
-
-  " Execute Python, import neovim and print a string. If import_result doesn't
-  " matches the printed string, the user is missing the neovim module
-  let import_result = system(python_host_prog .
-        \ ' -c "import neovim, sys; sys.stdout.write(\"ok\")"')
-  if import_result != 'ok'
-    throw 'No neovim module found for ' .
-          \ systemlist(python_host_prog . ' --version')[0] . '.' .
-          \ " See ':help nvim-python'."
-  endif
-
-  try
-    let channel_id = rpcstart(python_host_prog, args)
-    if rpcrequest(channel_id, 'poll') == 'ok'
-      return channel_id
-    endif
-  catch
+    echomsg v:exception
   endtry
   throw 'Failed to load python host. You can try to see what happened ' .
     \ 'by starting Neovim with $NVIM_PYTHON_PYTHON_LOG and opening '.
