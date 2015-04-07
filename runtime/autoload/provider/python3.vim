@@ -20,21 +20,24 @@ function! provider#python3#Prog()
 endfunction
 
 let s:plugin_path = expand('<sfile>:p:h').'/script_host.py'
-let s:rpcrequest = function('rpcrequest')
 
 " The Python3 provider plugin will run in a separate instance of the Python3
 " host.
 call remote#host#RegisterClone('legacy-python3-provider', 'python3')
 call remote#host#RegisterPlugin('legacy-python3-provider', s:plugin_path, [])
 
-" Ensure that we can load the Python3 host before bootstrapping
-try
-  let s:host = remote#host#Require('legacy-python3-provider')
-catch
-  echomsg v:exception
-  finish
-endtry
-
 function! provider#python3#Call(method, args)
+  if !exists('s:host')
+    let s:rpcrequest = function('rpcrequest')
+
+    " Ensure that we can load the Python3 host before bootstrapping
+    try
+      let s:host = remote#host#Require('legacy-python3-provider')
+    catch
+      echomsg v:exception
+      finish
+    endtry
+  endif
+
   return call(s:rpcrequest, insert(insert(a:args, 'python_'.a:method), s:host))
 endfunction
