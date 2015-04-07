@@ -96,7 +96,7 @@ class ScriptHost(object):
         # Python3 code (exec) must be a string, mixing bytes with
         # function_def would use bytes.__repr__ instead
         if isinstance and isinstance(code, bytes):
-            code = code.decode(nvim.options['encoding'].decode('ascii'))
+            code = code.decode(nvim.options['encoding'])
         # define the function
         function_def = 'def %s(line, linenr):\n %s' % (fname, code,)
         exec(function_def, self.module.__dict__)
