@@ -13,22 +13,26 @@ function! provider#pythonx#Detect(ver) abort
   let skip = exists(skip_var) ? {skip_var} : 0
   if exists(host_var)
     " Disable auto detection
-    return !s:check_interpreter({host_var}, a:ver, skip) ? {host_var} : ''
+    let [check, err] = s:check_interpreter({host_var}, a:ver, skip)
+    return check ? [{host_var}, err] : ['', err]
   endif
 
   for prog in ['python'.a:ver, 'python']
-    if s:check_interpreter(prog, a:ver, skip) && s:check_version(prog, a:ver, skip)
-      return prog
+    let [check, err] = s:check_interpreter(prog, a:ver, skip)
+    if check
+      let [check, err] = s:check_version(prog, a:ver, skip)
+      return [prog, err]
     endif
   endfor
 
-  " No python interpreter
-  return ''
+  " No Python interpreter
+  return ['', 'Neovim module installed Python'
+        \ .a:ver.' interpreter is not found.']
 endfunction
 
 function! s:check_version(prog, ver, skip) abort
   if a:skip
-    return 1
+    return [1, '']
   endif
 
   let get_version =
@@ -36,16 +40,19 @@ function! s:check_version(prog, ver, skip) abort
         \ '\".\" + str(sys.version_info[1]))"'
   let supported = (a:ver == 2) ?
         \ ['2.6', '2.7'] : ['3.3', '3.4', '3.5']
-  return index(supported, system(a:prog . get_version)) >= 0
+  if index(supported, system(a:prog . get_version)) >= 0
+    return [1, '']
+  endif
+  return [0, 'Python ' . get_version . ' interpreter is not supported.']
 endfunction
 
 function! s:check_interpreter(prog, ver, skip) abort
   if !executable(a:prog)
-    return 0
+    return [0, 'Python'.a:ver.' interpreter is not executable.']
   endif
 
   if a:skip
-    return 1
+    return [1, '']
   endif
 
   " Load neovim module check
@@ -54,6 +61,6 @@ function! s:check_interpreter(prog, ver, skip) abort
         \   '''import pkgutil; exit(pkgutil.get_loader("neovim") is None)''':
         \   '''import importlib; exit(importlib.find_loader("neovim") is None)''')
         \ )
-  return !v:shell_error
+  return [!v:shell_error, 'Python'.a:ver.' interpreter have not neovim module.']
 endfunction
 
