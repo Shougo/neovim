@@ -38,9 +38,8 @@ function! s:check_version(prog, ver, skip) abort
   let get_version =
         \ ' -c "import sys; sys.stdout.write(str(sys.version_info[0]) + '.
         \ '\".\" + str(sys.version_info[1]))"'
-  let supported = (a:ver == 2) ?
-        \ ['2.6', '2.7'] : ['3.3', '3.4', '3.5']
-  if index(supported, system(a:prog . get_version)) >= 0
+  let min_version = (a:ver == 2) ? '2.6' : '3.3'
+  if system(a:prog . get_version) >= min_version
     return [1, '']
   endif
   return [0, 'Python ' . get_version . ' interpreter is not supported.']
