@@ -9,6 +9,7 @@ asan_check() {
 }
 
 check_logs() {
+	local err
 	check_core_dumps
 	# Iterate through each log to remove an useless warning
 	for log in $(find "$1" -type f -name "$2"); do
