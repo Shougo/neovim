@@ -334,6 +334,8 @@ describe('packadd', function()
         let g:sequence = ''
         runtime! ALL extra/bar.vim
         call assert_equal('runstartopt', g:sequence)
+
+        call delete(s:topdir, 'rf')
       endfunc
     ]=])
     call('SetUp')
