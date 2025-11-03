@@ -2341,6 +2341,45 @@ void set_last_insert(int c)
   last_insert_skip = 0;
 }
 
+// Set the last inserted text to str.
+void set_last_insert_str(char *str)
+{
+    char  *s;
+    char  *p;
+    int     c;
+    size_t  len = str ? strlen(str) : 0;
+
+    xfree(last_insert.data);
+    last_insert.data = xmalloc(len * MB_MAXBYTES + 5);
+    if (last_insert.data == NULL) {
+      last_insert.size = 0;
+      return;
+    }
+
+    s = last_insert.data;
+    if (str != NULL) {
+      for (p = str; *p != NUL; MB_PTR_ADV(p)) {
+        c = utf_ptr2char(p);
+        // Use the CTRL-V only when entering a special char
+        if (c < ' ' || c == DEL) {
+          *s++ = Ctrl_V;
+        }
+
+        s = add_char2buf(c, s);
+      }
+    }
+
+    *s++ = ESC;
+    *s = NUL;
+
+    last_insert.size = (size_t)(s - last_insert.data);
+    last_insert_skip = 0;
+
+    // Change redo buff
+    ResetRedobuff();
+    AppendToRedobuffLit(s, -1);
+}
+
 #if defined(EXITFREE)
 void free_last_insert(void)
 {

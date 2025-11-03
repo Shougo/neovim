@@ -2536,7 +2536,7 @@ void write_reg_contents(int name, const char *str, ssize_t len, int must_append)
 void write_reg_contents_lst(int name, char **strings, bool must_append, MotionType yank_type,
                             colnr_T block_len)
 {
-  if (name == '/' || name == '=') {
+  if (name == '/' || name == '=' || name == '.') {
     char *s = strings[0];
     if (strings[0] == NULL) {
       s = "";
@@ -2591,6 +2591,13 @@ void write_reg_contents_ex(int name, const char *str, ssize_t len, bool must_app
   // Special case: '/' search pattern
   if (name == '/') {
     set_last_search_pat(str, RE_SEARCH, true, true);
+    return;
+  }
+
+  // Special case: '.' dot repeat register
+  if (name == '.')
+  {
+    set_last_insert_str(str);
     return;
   }
 
